@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All topics of forum{% endblock %}
+
+{% block body %}
+<div class="container-wrapper">
+    <h1>Here are all topics</h1>
+    <div class="container">
+        {% for topic in topics %}
+            <div class="topic">
+                <h2>{{ topic.title }}</h2>
+                <p class="topic-status">{{ topic.isLock == false ? 'Not resolved': 'Resolved' }}</p>
+                <p class="topic-posted">Posted on {{ topic.createdAt | date('d-m-Y H:i:s') }}</p>
+                <p class="topic-content">{{ topic.content }}</p>
+{#                {{ dump(topic.messages) }}#}
+                {% if topic.messages | length > 0 %}
+                    <p class="topic-more">
+                        <a href="{{ path('show_topic', {'id': topic.id}) }}" class="topic-more-link">
+                            See all answers
+                        </a>
+                    </p>
+                {% else %}
+                    <p>
+                        <a href="{{ path('show_topic', {'id': topic.id}) }}" class="topic-link-no-answer">
+                            Be first to add an answser
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
