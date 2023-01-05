@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Message;
+use App\Entity\Topic;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,17 +17,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class MessageController extends AbstractController
 {
     /**
-     * @Route("/message/add", name="message_add")
-     * @Route("/message/{id}/edit", name="message_edit")
+     * @Route("/message/edit/{id}", name="message_edit")
      */
-    public function addEditMessage(Message $message = null, Request $request, ManagerRegistry $doctrine):Response
+    public function editMessage(Message $message , Request $request, ManagerRegistry $doctrine):Response
     {
         $entityManager = $doctrine->getManager();
-        if(!$message){
-            $message = new Message();
-        }
+
         $form = $this->createFormBuilder($message)
-        ->add('content', TextType::class, [
+        ->add('content', TextareaType::class, [
             'label'=> 'Content : '
         ])
         ->add('Submit', SubmitType::class)
@@ -33,11 +34,46 @@ class MessageController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             $entityManager->persist($message);
             $entityManager->flush();
+            return $this->redirectToRoute('show_topic', [
+                'id'=> $message->getTopic()->getId()
+            ]);
+        }
+        return $this->render('message/edit.html.twig', [
+            'controller_name' => 'MessageController',
+            'messageForm'=> $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/message/add", name="message_add")
+     */
+    public function addMessage(Message $message = null , Request $request, ManagerRegistry $doctrine):Response
+    {
+
+        $entityManager = $doctrine->getManager();
+
+        if(!$message){
+            $message = new Message();
+        }
+        $form = $this->createFormBuilder($message)
+            ->add('content', TextareaType::class, [
+                'label'=> 'Content : '
+            ])
+//        ->add('topic', EntityType::class, [
+//            'class'=> Topic::class
+//        ])
+            ->add('Submit', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $entityManager->persist($message);
+            $entityManager->flush();
             return $this->redirectToRoute('app_message');
         }
         return $this->render('message/edit.html.twig', [
             'controller_name' => 'MessageController',
-            'form'=> $form->createView()
+            'messageForm'=> $form->createView()
         ]);
     }
 

@@ -6,6 +6,11 @@
 <div class="container-wrapper">
     <h1>Here are all topics</h1>
     <div class="container">
+        <div class="add-topic">
+            <p>
+                <a href="{{ path('app_topic_add') }}">Add a topic</a>
+            </p>
+        </div>
         {% for topic in topics %}
             <div class="topic">
                 <h2>{{ topic.title }}</h2>

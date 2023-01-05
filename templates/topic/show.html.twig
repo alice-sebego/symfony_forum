@@ -11,28 +11,36 @@
                 <p class="topic-content">
                     {{ topic.content }}
                 </p>
+                <p>{{ topic.id }}</p>
             </div>
             <div class="answers">
-                {% if topic.isLock == false %}
-                    <p class="answer-lock-up">
-                        <a href="{{ path('message_add') }}" class="add-answer">Add an answer</a>
-                    </p>
-                {% else %}
-                    <p class="answer-locked-down">
-                        Resolved post :) We cannot add a new answer
-                    </p>
-                {% endif %}
                 {% if topic.messages | length > 0 %}
+
+                    {% if topic.isLock == false %}
+                        <p class="answer-lock-up">
+                            <a href="{{ path('message_add') }}" class="add-answer">Add a new answer</a>
+                        </p>
+                    {% else %}
+                        <p class="answer-locked-down">
+                            Resolved post :) We cannot add a new answer
+                        </p>
+                    {% endif %}
+
                     {% for message in topic.messages %}
                         <div class="answer">
                             <p>{{ message.createdAt | date('d-m-Y H:i:s') }}</p>
                             <p>{{ message.content }}</p>
                         </div>
+                        <div class="edit-msg">
+                            <p>
+                                <a href="{{ path('message_edit', {'id': message.id}) }}">Editer</a>
+                            </p>
+                        </div>
                     {% endfor %}
                 {% else %}
                     <p class="no-answer">
                         No answer currently<br>
-                        <a href="{{ path('edit_message') }}">Add an answer</a>
+                        <a href="{{ path('message_add') }}">Add a first answer</a>
                     </p>
                 {% endif %}
             </div>

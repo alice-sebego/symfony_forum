@@ -40,6 +40,7 @@ class Message
 
     public function __construct()
     {
+        //$this->topic = "";
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
     }
