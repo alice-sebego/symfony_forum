@@ -43,6 +43,8 @@ class Message
      */
     private $user;
 
+
+
     public function __construct()
     {
         //$this->topic = "";

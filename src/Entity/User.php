@@ -6,11 +6,15 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields={"pseudo"}, message="There is already an account with this pseudo")
  */
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -20,19 +24,20 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     private $pseudo;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $password;
-
-    /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="json")
      */
     private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string")
+     */
+    private $password;
 
     /**
      * @ORM\Column(type="datetime")
@@ -42,12 +47,12 @@ class User
     /**
      * @ORM\OneToMany(targetEntity=Topic::class, mappedBy="user")
      */
-    private $topics;
+    private Collection $topics;
 
     /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="user")
      */
-    private $messages;
+    private Collection $messages;
 
     public function __construct()
     {
@@ -73,7 +78,47 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->pseudo;
+    }
+
+    /**
+     * @deprecated since Symfony 5.3, use getUserIdentifier instead
+     */
+    public function getUsername(): string
+    {
+        return (string) $this->pseudo;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -85,24 +130,32 @@ class User
         return $this;
     }
 
-    public function getRoles(): ?array
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
     {
-        return $this->roles;
+        return null;
     }
 
-    public function setRoles(?array $roles): self
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
     {
-        $this->roles = $roles;
-
-        return $this;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 

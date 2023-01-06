@@ -54,6 +54,7 @@ class Topic
      */
     private $user;
 
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
