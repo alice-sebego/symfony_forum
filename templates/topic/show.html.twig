@@ -7,7 +7,9 @@
         <h1>{{ topic.title }}</h1>
         <div class="container">
             <div class="topic">
-                <p class="topic-posted">{{ topic.createdAt | date('d-m-Y H:i:s') }}</p>
+                <p class="topic-posted">
+                    {{ topic.createdAt | date('d-m-Y H:i:s') }} | Posted by {{ topic.user ? topic.user : 'Anonymous author' }}
+                </p>
                 <p class="topic-content">
                     {{ topic.content }}
                 </p>
@@ -17,7 +19,6 @@
 
                     {% if topic.isLock == false %}
                         <p class="answer-lock-up">
-{#                            <a href="{{ path('message_add', {'id': topic.id}) }}" class="add-answer">Add a new answer</a>#}
                             Add a new answer
                             {{ form(messageForm, {'attr': {'novalidate': 'novalidate'}}) }}
                         </p>
@@ -30,7 +31,7 @@
 
                     {% for message in topic.messages %}
                         <div class="answer">
-                            <p>{{ message.createdAt | date('d-m-Y H:i:s') }}</p>
+                            <p>{{ message.createdAt | date('d-m-Y H:i:s') }} | Posted by {{ message.user ? message.user : 'Anonymous author' }}</p>
                             <p>{{ message.content }}</p>
                         </div>
                         <div class="edit-msg">
@@ -42,7 +43,6 @@
                 {% else %}
                     <p class="no-answer">
                         No answer currently<br>
-{#                        <a href="{{ path('message_add', {'id': topic.id}) }}">Add a first answer</a>#}
                         Add a first answer
                         {{ form(messageForm) }}
                     </p>
