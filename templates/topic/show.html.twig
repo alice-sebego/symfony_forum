@@ -11,15 +11,17 @@
                 <p class="topic-content">
                     {{ topic.content }}
                 </p>
-                <p>{{ topic.id }}</p>
             </div>
             <div class="answers">
                 {% if topic.messages | length > 0 %}
 
                     {% if topic.isLock == false %}
                         <p class="answer-lock-up">
-                            <a href="{{ path('message_add') }}" class="add-answer">Add a new answer</a>
+{#                            <a href="{{ path('message_add', {'id': topic.id}) }}" class="add-answer">Add a new answer</a>#}
+                            Add a new answer
+                            {{ form(messageForm, {'attr': {'novalidate': 'novalidate'}}) }}
                         </p>
+
                     {% else %}
                         <p class="answer-locked-down">
                             Resolved post :) We cannot add a new answer
@@ -33,18 +35,19 @@
                         </div>
                         <div class="edit-msg">
                             <p>
-                                <a href="{{ path('message_edit', {'id': message.id}) }}">Editer</a>
+                                <a href="{{ path('message_edit', {'id': message.id}) }}">Edit</a>
                             </p>
                         </div>
                     {% endfor %}
                 {% else %}
                     <p class="no-answer">
                         No answer currently<br>
-                        <a href="{{ path('message_add') }}">Add a first answer</a>
+{#                        <a href="{{ path('message_add', {'id': topic.id}) }}">Add a first answer</a>#}
+                        Add a first answer
+                        {{ form(messageForm) }}
                     </p>
                 {% endif %}
             </div>
         </div>
-
     </div>
 {% endblock %}

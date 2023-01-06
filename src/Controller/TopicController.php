@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Message;
 use App\Entity\Topic;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -69,13 +70,34 @@ class TopicController extends AbstractController
     /**
      * @Route("/{id}", name="show_topic")
      */
-    public function show(ManagerRegistry $doctrine, int $id): Response
+    public function showTopicAddMessage(Message $message = null, Topic $topic, Request $request, ManagerRegistry $doctrine, int $id): Response
     {
-        $repository = $doctrine->getRepository(Topic::class);
-        $topic = $repository->find($id);
+        $message = new Message();
+
+        $form = $this->createFormBuilder($message)
+            ->add('content', TextareaType::class, [
+                'label'=> 'Content : '
+            ])
+            ->add('Submit', SubmitType::class)
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $message->setTopic($topic);
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($message);
+            $entityManager->flush();
+            return $this->redirectToRoute('show_topic', [
+                    'id'=> $topic->getId()
+                ]
+            );
+        }
+
         return $this->render('topic/show.html.twig', [
             'controller_name' => 'TopicController',
-            'topic'=> $topic
+            'topic'=> $topic,
+            'messageForm'=> $form->createView()
         ]);
     }
 

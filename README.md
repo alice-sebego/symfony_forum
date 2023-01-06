@@ -14,3 +14,9 @@ Voici les elements d'analyses à votre disposition :
 - Enfin sujet devra être vérrouillable (plus aucun message ne pourra alors y être posté) et dévérouillable à souhait.
 
 Aucune doléance d'ordre graphique ou illustrative n'est soumise au concepteur de la plateforme, les choix visuels devront toutefois se conformer aux standards actuels.
+
+V2
+
+
+
+Suppression de sujet et de messages
