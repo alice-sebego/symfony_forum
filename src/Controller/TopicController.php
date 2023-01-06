@@ -22,9 +22,15 @@ class TopicController extends AbstractController
      * @Route("/add", name="app_topic_add")
      * @Route("/{id}/edit", name="app_topic_edit")
      */
-    public function addEditTopic(Topic $topic = null, Request $request, ManagerRegistry $doctrine): Response{
+    public function addEditTopic(Topic $topic = null, Request $request, ManagerRegistry $doctrine): Response
+    {
+
+        if(!$this->getUser()){
+            return $this->redirectToRoute('app_login');
+        }
 
         $entityManager = $doctrine->getManager();
+
         if(!$topic){
             $topic = new Topic();
         }
@@ -42,6 +48,7 @@ class TopicController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+            $topic->setUser($this->getUser());
             $entityManager->persist($topic);
             $entityManager->flush();
 
@@ -72,6 +79,10 @@ class TopicController extends AbstractController
      */
     public function showTopicAddMessage(Message $message = null, Topic $topic, Request $request, ManagerRegistry $doctrine, int $id): Response
     {
+        if(!$this->getUser()){
+            return $this->redirectToRoute('app_login');
+        }
+
         $message = new Message();
 
         $form = $this->createFormBuilder($message)
@@ -85,6 +96,7 @@ class TopicController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
             $message->setTopic($topic);
+            $message->setUser($this->getUser());
             $entityManager = $doctrine->getManager();
             $entityManager->persist($message);
             $entityManager->flush();
