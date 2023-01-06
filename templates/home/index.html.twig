@@ -5,7 +5,7 @@
 {% block body %}
 
     <div class="example-wrapper">
-        <h1>Welcome to the forum</h1>
+        <h1>Welcome to the forum {{ app.user ? app.user.pseudo : "to you" }} </h1>
 
     </div>
 {% endblock %}
