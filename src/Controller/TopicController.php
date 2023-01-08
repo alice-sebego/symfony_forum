@@ -6,6 +6,8 @@ use App\Entity\Message;
 use App\Entity\Topic;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -77,7 +79,7 @@ class TopicController extends AbstractController
     /**
      * @Route("/{id}", name="show_topic")
      */
-    public function showTopicAddMessage(Message $message = null, Topic $topic, Request $request, ManagerRegistry $doctrine, int $id): Response
+    public function showTopicAddMessage(Message $message = null, Topic $topic, Request $request, ManagerRegistry $doctrine): Response
     {
         if(!$this->getUser()){
             return $this->redirectToRoute('app_login');
@@ -110,6 +112,43 @@ class TopicController extends AbstractController
             'controller_name' => 'TopicController',
             'topic'=> $topic,
             'messageForm'=> $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/islocked", name="locked_topic")
+     */
+
+    public function lockedOrUnlockedTopic(Topic $topic, Request $request, ManagerRegistry $doctrine, int $id): Response
+    {
+        $entityManager = $doctrine->getManager();
+
+        $form = $this->createFormBuilder($topic)
+              ->add('islock', ChoiceType::class, [
+                  'label' => 'Locked Status : ',
+                  'choices' =>[
+                      'Resolved'=> 1,
+                      'Not resolved' => 0
+                  ]
+            ])
+            ->add('Submit', SubmitType::class)
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $entityManager->persist($topic);
+            $entityManager->flush();
+            return $this->redirectToRoute('show_topic', [
+                    'id'=> $topic->getId()
+                ]
+            );
+        }
+
+        return $this->render('topic/locked-topic.html.twig', [
+            'id'=> $topic->getId(),
+            'topic'=> $topic,
+            'isLockedForm'=> $form->createView()
         ]);
     }
 

@@ -10,6 +10,10 @@
                 <p class="topic-posted">
                     {{ topic.createdAt | date('d-m-Y H:i:s') }} | Posted by {{ topic.user ? topic.user : 'Anonymous author' }}
                 </p>
+                <p class="topic-status">
+                    {{ topic.isLock == false ? 'Not resolved': 'Resolved' }} |
+                    <a href="{{ path('locked_topic', {'id': topic.id}) }}">Change status</a>
+                </p>
                 <p class="topic-content">
                     {{ topic.content }}
                 </p>
